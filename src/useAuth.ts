@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useCallback, useContext } from "react";
 
 import { AuthContext } from "./AuthProvider";
 import {
@@ -79,11 +79,11 @@ export const useAuth: useAuthInterface = () => {
         AuthContext
     );
 
-    const login = () => {
+    const login = useCallback(() => {
         auth0 && auth0.authorize();
-    };
+    }, [auth0]);
 
-    const logout = () => {
+    const logout = useCallback(() => {
         auth0 &&
             auth0.logout({
                 returnTo: callback_domain
@@ -94,9 +94,9 @@ export const useAuth: useAuthInterface = () => {
 
         // Return to the homepage after logout.
         navigate("/");
-    };
+    }, [auth0, navigate]);
 
-    const handleAuthentication = ({ postLoginRoute = "/" } = {}) => {
+    const handleAuthentication = useCallback(({ postLoginRoute = "/" } = {}) => {
         if (typeof window !== "undefined") {
             dispatch({
                 type: "startAuthenticating"
@@ -119,11 +119,11 @@ export const useAuth: useAuthInterface = () => {
                     }
                 );
         }
-    };
+    }, [auth0]);
 
-    const isAuthenticated = () => {
+    const isAuthenticated = useCallback(() => {
         return !!(state.expiresAt && new Date().getTime() < state.expiresAt);
-    };
+    }, [state]);
 
     return {
         isAuthenticating: state.isAuthenticating,
